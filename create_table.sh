@@ -15,14 +15,14 @@ create_table() {
         exit 1
     fi
 
-    # Create default ID column
-    echo "ID" > "$table_file"
-
-    # Prompt user to enter the names of columns
+    column_names=""
     for ((i = 1; i <= num_columns; i++)); do
         read -p "Enter the name of column $i: " column_name
-        echo "$column_name" >> "$table_file"
+        column_names+=" $column_name"
     done
+
+    # Create default ID column and append column names
+    echo "ID$column_names" > "$table_file"
 
     echo "Table '$tablename' created successfully in the database '$dbname'."
 }

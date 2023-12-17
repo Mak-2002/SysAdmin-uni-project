@@ -36,7 +36,7 @@ case $dbtype in
     # Public Database
     # Grant full access to all users
     chmod 777 "Databases/$dbname"
-    echo "Public database created successfully."
+    echo "Database set to public."
     ;;
 2)
     # Private Database
@@ -54,7 +54,7 @@ case $dbtype in
         echo "Warning: No Admins file found."
         # exit 1
     fi
-    echo "Private database created successfully."
+    echo "Database set to private."
     ;;
 *)
     echo "Invalid choice. Exiting."

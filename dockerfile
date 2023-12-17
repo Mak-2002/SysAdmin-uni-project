@@ -8,6 +8,9 @@ RUN apt-get update && \
 # Set the working directory inside the container
 WORKDIR /app
 
+# Set permissions for /app
+RUN chmod 777 /app
+
 # Copy the contents of the current directory into the container at /app
 COPY . /app
 

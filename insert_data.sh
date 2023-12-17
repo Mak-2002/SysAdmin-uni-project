@@ -39,13 +39,26 @@ insert_data() {
         echo "- $column"
     done
 
-    # Prompt user to enter data for each column
-    read -p "Enter the data for each column (separated by spaces): " data_values
+    # Automatically generate an incremental ID, ignoring the header
+    if [ -s "$table_file" ]; then
+        last_id=$(tail -n +2 "$table_file" | cut -f1 | awk '{print int($1)}' | sort -n | tail -n 1)
+        if [ -n "$last_id" ]; then
+            new_id=$((last_id + 1))
+        else
+            new_id=1
+        fi
+    else
+        new_id=1
+    fi
 
-    # Append the data to the table file
-    echo "$data_values" >>"$table_file"
 
-    echo "Data inserted successfully into Table '$tablename' in the database '$dbname'."
+    # Prompt user to enter data for each column (excluding the ID)
+    read -p "Enter the data for each column (excluding the ID, separated by spaces): " data_values
+
+    # Append the generated ID and the data to the table file
+    echo "$new_id $data_values" >>"$table_file"
+
+    echo "Data inserted successfully into Table '$tablename' in the database '$dbname' with ID $new_id."
 }
 
 # Function to display available databases if it's owned by this user or this user is an admin
