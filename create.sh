@@ -29,6 +29,7 @@ echo "2. Private"
 read -p "Choice(1/2): " dbtype
 
 # TODO: create admin users when initializing the container
+# TODO: modify database listing to only list the databases that user have access to
 
 case $dbtype in
 1)
