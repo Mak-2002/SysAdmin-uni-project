@@ -1,12 +1,21 @@
 #!/bin/bash
 
-# Display available databases
+# Function to display available databases if it's owned by this user or this user is an admin
+display_databases() {
     echo "Available Databases:"
     for database in Databases/*; do
         if [ -d "$database" ]; then
-            echo "- $(basename "$database")"
+          # Get the database name
+          dbname=$(basename "$database")
+
+          if [ "$(stat -c %U "Databases/$dbname")" == "$(whoami)" ] || id -nG "$(whoami)" | grep -qw "admins"; then
+            echo "- $dbname"
+          fi
+          
         fi
     done
+}
+display_databases
 
 # Prompt the user to enter the name of the Database to empty
 read -p "Enter the name of the Database to empty: " dbname

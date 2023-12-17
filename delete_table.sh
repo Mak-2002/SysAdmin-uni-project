@@ -45,13 +45,24 @@ delete_table() {
     echo "Table '$tablename' deleted successfully from the database '$dbname'."
 }
 
+# Function to display available databases if it's owned by this user or this user is an admin
+display_databases() {
+    echo "Available Databases:"
+    for database in Databases/*; do
+        if [ -d "$database" ]; then
+          # Get the database name
+          dbname=$(basename "$database")
+
+          if [ "$(stat -c %U "Databases/$dbname")" == "$(whoami)" ] || id -nG "$(whoami)" | grep -qw "admins"; then
+            echo "- $dbname"
+          fi
+          
+        fi
+    done
+}
+
 # Display available databases
-echo "Available Databases:"
-for database in Databases/*; do
-    if [ -d "$database" ]; then
-        echo "- $(basename "$database")"
-    fi
-done
+display_databases
 
 # Prompt the user to enter the name of the Database to delete tables from
 read -p "Enter the name of the Database to delete tables from: " dbname

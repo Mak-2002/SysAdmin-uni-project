@@ -1,11 +1,17 @@
 #!/bin/bash
 
-# Function to display available databases
+# Function to display available databases if it's owned by this user or this user is an admin
 display_databases() {
     echo "Available Databases:"
     for database in Databases/*; do
         if [ -d "$database" ]; then
-            echo "- $(basename "$database")"
+          # Get the database name
+          dbname=$(basename "$database")
+
+          if [ "$(stat -c %U "Databases/$dbname")" == "$(whoami)" ] || id -nG "$(whoami)" | grep -qw "admins"; then
+            echo "- $dbname"
+          fi
+          
         fi
     done
 }
@@ -77,32 +83,30 @@ if [ ! -d "Databases/$dbname" ]; then
     exit 1
 fi
 
+# Check if the user is the owner or an admin
+if [ "$(stat -c %U "Databases/$dbname")" != "$(whoami)" ] && ! id -nG "$(whoami)" | grep -qw "admins"; then
+  echo "Error: You don't have permission to delete data from tables in this database. Only admins or the owner can delete data."
+  exit 1
+fi
+
 # Display tables in the selected database
 display_tables "$dbname"
 
 # Prompt the user to enter the name of the table to delete data from
 read -p "Enter the name of the table to delete data from: " tablename
 
-# Check if the user is a member of the private database group
-if [ "$(id -Gn | grep -c "$dbname")" -gt 0 ]; then
-    # User is a member of the private database group
-    # Provide options for deleting all data or data based on specific criteria
-    read -p "Choose an option (1. Delete all data / 2. Delete data based on specific criteria): " delete_option
+# Provide options for deleting all data or data based on specific criteria
+read -p "Choose an option (1. Delete all data / 2. Delete data based on specific criteria): " delete_option
 
-    case $delete_option in
-        1)
-            delete_all_data "$dbname" "$tablename"
-            ;;
-        2)
-            delete_data_by_criteria "$dbname" "$tablename"
-            ;;
-        *)
-            echo "Invalid option. Exiting."
-            exit 1
-            ;;
-    esac
-else
-    # User is not a member of the private database group (public database)
-    echo "You are accessing a public database. You can only delete data based on specific criteria."
-    delete_data_by_criteria "$dbname" "$tablename"
-fi
+case $delete_option in
+    1)
+        delete_all_data "$dbname" "$tablename"
+        ;;
+    2)
+        delete_data_by_criteria "$dbname" "$tablename"
+        ;;
+    *)
+        echo "Invalid option. Exiting."
+        exit 1
+        ;;
+esac

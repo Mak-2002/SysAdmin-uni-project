@@ -1,11 +1,17 @@
 #!/bin/bash
 
-# Function to display available databases
+# Function to display available databases for users in the private database group
 display_databases() {
     echo "Available Databases:"
     for database in Databases/*; do
         if [ -d "$database" ]; then
-            echo "- $(basename "$database")"
+            # Get the database name
+            dbname=$(basename "$database")
+
+            # Check if the user is a member of the private database group
+            if id -nG "$(whoami)" | grep -qw "$dbname"; then
+                echo "- $dbname"
+            fi
         fi
     done
 }
@@ -97,6 +103,13 @@ read -p "Enter the name of the Database to update data in: " dbname
 # Check if the database exists
 if [ ! -d "Databases/$dbname" ]; then
     echo "Error: Database '$dbname' does not exist."
+    exit 1
+fi
+
+# Check if the user is a member of the private database group or the database is public 
+# (the user has access to the database)
+if ! [ -w "$database" ] ; then
+    echo "Error:  You don't have permission to update data in tables in this database. Only users from the same private group can update data."
     exit 1
 fi
 
