@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Check if the "admins" group exists; create it if not
-if ! getent group admins &>/dev/null; then
-    groupadd admins
-    echo "Group 'admins' created."
-fi
-
 # Check if the Admins file exists
 if [ ! -f "Admins" ]; then
     echo "Error: Admins file not found."
     exit 1 
+fi
+
+# Check if the "admins" group exists; create it if not
+if ! getent group admins &>/dev/null; then
+    groupadd admins
+    echo "Group 'admins' created."
 fi
 
 # Create users and add them to the admins group

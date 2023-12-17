@@ -21,7 +21,7 @@ fi
 if [ "$(stat -c %U "Databases/$dbname")" != "$(whoami)" ] &&
   ! id -nG "$(whoami)" | grep -qw "admins"; then
 
-  echo "Error: Insufficient permissions. Only admins or the owner can delete this database."
+  echo "Error: You don't have permission to delete this database. Only admins or the owner can delete a database."
   exit 1
 fi
 
