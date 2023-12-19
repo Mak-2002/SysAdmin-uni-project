@@ -40,19 +40,20 @@ case $dbtype in
     ;;
 2)
     # Private Database
-    # Add admins from the Admins file to the group
-    if [ -f "Admins" ]; then
-        while IFS= read -r admin; do
+    # Add users from the "admins" group to the private database group
+    if getent group admins &>/dev/null; then
+        users_in_admins=$(getent group admins | cut -d: -f4)
+        for admin in $users_in_admins; do
             if id "$admin" &>/dev/null; then
                 usermod -aG "$dbname" "$admin"
-                echo "Admin '$admin' added to the group."
+                # echo "User '$admin' added to the group."
             else
-                echo "Warning: Admin '$admin' not found."
+                echo "Warning: Admin user '$admin' not found."
             fi
-        done <Admins
+        done
+        echo "Users from 'admins' group added to the database group."
     else
-        echo "Warning: No Admins file found."
-        # exit 1
+        echo "Warning: Group 'admins' not found."
     fi
     echo "Database set to private."
     ;;

@@ -13,4 +13,4 @@ fi
 excel_file="$log_dir/logs_$(date +'%Y%m%d_%H%M%S').xlsx"
 awk -F: '{ print $1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6 }' "$log_dir/events.log" > "$excel_file"
 
-echo "Logs exported successfully to: $excel_file"
+echo "Logs exported succesfully to: $excel_file"
